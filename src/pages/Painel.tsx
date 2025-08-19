@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -49,53 +48,68 @@ const Painel = () => {
   });
 
   const fetchAlunos = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("alunos")
-        .select("*")
-        .order("nome");
-      
-      if (error) throw error;
-      setAlunos(data || []);
-    } catch (error) {
-      console.error("Erro ao buscar alunos:", error);
-      toast({
-        title: "Erro",
-        description: "Erro ao carregar alunos",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+    // Dados mockados para demonstração
+    const mockData: Aluno[] = [
+      {
+        id: "1",
+        nome: "João Silva",
+        matricula: "MAT001",
+        mensalidade: 850.00,
+        status_pagamento: "Pago",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      {
+        id: "2", 
+        nome: "Maria Santos",
+        matricula: "MAT002",
+        mensalidade: 850.00,
+        status_pagamento: "Pendente",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      {
+        id: "3",
+        nome: "Pedro Oliveira", 
+        matricula: "MAT003",
+        mensalidade: 900.00,
+        status_pagamento: "Pago",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      {
+        id: "4",
+        nome: "Ana Costa",
+        matricula: "MAT004", 
+        mensalidade: 850.00,
+        status_pagamento: "Pendente",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+    ];
+    
+    setAlunos(mockData);
+    setLoading(false);
+    
+    toast({
+      title: "Aviso",
+      description: "Usando dados de demonstração. Para funcionalidade completa, ative a integração com Supabase.",
+      variant: "destructive",
+    });
   };
 
   const toggleStatusPagamento = async (id: string, currentStatus: string) => {
     const newStatus = currentStatus === "Pago" ? "Pendente" : "Pago";
     
-    try {
-      const { error } = await supabase
-        .from("alunos")
-        .update({ status_pagamento: newStatus })
-        .eq("id", id);
+    // Simulação para demonstração
+    setAlunos(alunos.map(aluno => 
+      aluno.id === id ? { ...aluno, status_pagamento: newStatus as "Pago" | "Pendente" } : aluno
+    ));
 
-      if (error) throw error;
-
-      setAlunos(alunos.map(aluno => 
-        aluno.id === id ? { ...aluno, status_pagamento: newStatus as "Pago" | "Pendente" } : aluno
-      ));
-
-      toast({
-        title: "Status atualizado",
-        description: `Status alterado para ${newStatus}`,
-      });
-    } catch (error) {
-      console.error("Erro ao atualizar status:", error);
-      toast({
-        title: "Erro",
-        description: "Erro ao atualizar status de pagamento",
-        variant: "destructive",
-      });
-    }
+    toast({
+      title: "Status atualizado (demo)",
+      description: `Status alterado para ${newStatus}. Para persistir dados, ative o Supabase.`,
+    });
   };
 
   const exportToCSV = () => {
@@ -123,53 +137,40 @@ const Painel = () => {
   };
 
   const onSubmit = async (data: AlunoFormData) => {
-    try {
-      if (editingAluno) {
-        const { error } = await supabase
-          .from("alunos")
-          .update({
-            nome: data.nome,
-            matricula: data.matricula,
-            mensalidade: data.mensalidade,
-          })
-          .eq("id", editingAluno.id);
-
-        if (error) throw error;
-        
-        toast({
-          title: "Aluno atualizado",
-          description: "Dados do aluno atualizados com sucesso",
-        });
-      } else {
-        const { error } = await supabase
-          .from("alunos")
-          .insert([{
-            nome: data.nome,
-            matricula: data.matricula,
-            mensalidade: data.mensalidade,
-            status_pagamento: "Pendente",
-          }]);
-
-        if (error) throw error;
-        
-        toast({
-          title: "Aluno adicionado",
-          description: "Novo aluno cadastrado com sucesso",
-        });
-      }
-
-      setIsDialogOpen(false);
-      setEditingAluno(null);
-      form.reset();
-      fetchAlunos();
-    } catch (error) {
-      console.error("Erro ao salvar aluno:", error);
+    // Simulação para demonstração
+    if (editingAluno) {
+      setAlunos(alunos.map(aluno => 
+        aluno.id === editingAluno.id 
+          ? { ...aluno, nome: data.nome, matricula: data.matricula, mensalidade: data.mensalidade }
+          : aluno
+      ));
+      
       toast({
-        title: "Erro",
-        description: "Erro ao salvar aluno",
-        variant: "destructive",
+        title: "Aluno atualizado (demo)",
+        description: "Para persistir dados, ative a integração com Supabase",
+      });
+    } else {
+      const novoAluno: Aluno = {
+        id: Date.now().toString(),
+        nome: data.nome,
+        matricula: data.matricula,
+        mensalidade: data.mensalidade,
+        status_pagamento: "Pendente",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      
+      setAlunos([...alunos, novoAluno]);
+      
+      toast({
+        title: "Aluno adicionado (demo)",
+        description: "Para persistir dados, ative a integração com Supabase",
       });
     }
+
+    setIsDialogOpen(false);
+    setEditingAluno(null);
+    form.reset();
   };
 
   const openEditDialog = (aluno: Aluno) => {
