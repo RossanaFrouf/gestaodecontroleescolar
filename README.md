@@ -1,7 +1,9 @@
 # 🎓 Painel de Controle Escolar - Lovable
 
 Este é um **painel de controle escolar básico** desenvolvido no **Lovable** como parte de um desafio técnico.  
-O sistema foi construído em menos de 2 horas utilizando apenas recursos no-code do Lovable.  
+O sistema foi construído em menos de 2 horas utilizando apenas recursos no-code do Lovable.
+
+https://school-pay-dash-3hx6.vercel.app/  
 
 ---
 
