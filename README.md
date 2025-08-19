@@ -20,7 +20,9 @@ O sistema foi construído em menos de 2 horas utilizando apenas recursos no-code
 ---
 
 ## 🛠️ Tecnologias utilizadas
-- [Lovable](https://lovable.dev) – plataforma no-code para criação de aplicações.  
+- [Lovable](https://lovable.dev) – plataforma no-code para criação de aplicações.
+- [Supabase](https://supabase.com/) - plataforma Supabase -(Banco de dados e API)
+- [React + Next.js] (estrutura base gerada pelo Lovable)
 
 ---
 
