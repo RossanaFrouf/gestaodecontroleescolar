@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,13 +15,13 @@ import { Badge } from "@/components/ui/badge";
 import { Download, Plus, Edit } from "lucide-react";
 
 interface Aluno {
-  id: string;
+  id?: string;
   nome: string;
   matricula: string;
   mensalidade: number;
   status_pagamento: "Pago" | "Pendente";
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 const alunoSchema = z.object({
@@ -48,54 +49,37 @@ const Painel = () => {
   });
 
   const fetchAlunos = async () => {
-    // Dados mockados para demonstração
-    const mockData: Aluno[] = [
-      {
-        id: "1",
-        nome: "João Silva",
-        matricula: "MAT001",
-        mensalidade: 850.00,
-        status_pagamento: "Pago",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      {
-        id: "2", 
-        nome: "Maria Santos",
-        matricula: "MAT002",
-        mensalidade: 850.00,
-        status_pagamento: "Pendente",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      {
-        id: "3",
-        nome: "Pedro Oliveira", 
-        matricula: "MAT003",
-        mensalidade: 900.00,
-        status_pagamento: "Pago",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      {
-        id: "4",
-        nome: "Ana Costa",
-        matricula: "MAT004", 
-        mensalidade: 850.00,
-        status_pagamento: "Pendente",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+    try {
+      const { data, error } = await supabase
+        .from('alunos')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        toast({
+          title: "Erro",
+          description: "Erro ao carregar alunos: " + error.message,
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
       }
-    ];
-    
-    setAlunos(mockData);
-    setLoading(false);
-    
-    toast({
-      title: "Aviso",
-      description: "Usando dados de demonstração. Para funcionalidade completa, ative a integração com Supabase.",
-      variant: "destructive",
-    });
+
+      const formattedData = (data || []).map(item => ({
+        ...item,
+        id: item.matricula, // Use matricula as id since it's the primary key
+        status_pagamento: item.status_pagamento as "Pago" | "Pendente"
+      }));
+      setAlunos(formattedData);
+      setLoading(false);
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Erro inesperado ao carregar dados",
+        variant: "destructive",
+      });
+      setLoading(false);
+    }
   };
 
   const toggleStatusPagamento = async (id: string, currentStatus: string) => {
